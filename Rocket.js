@@ -7,6 +7,7 @@ export default class Rocket{
         this.acceleration = V.createNew(0, 0);
         this.dna = [];
         this.gotToTarget = false;
+        this.crashed = false;
     }
 
     applyForce(vector){
@@ -14,7 +15,7 @@ export default class Rocket{
     }
 
     update(){
-        if(!this.gotToTarget){
+        if(!this.gotToTarget && !this.crashed){
             this.velocity.add(this.acceleration);
             this.position.add(this.velocity);
             this.acceleration.mult(0);

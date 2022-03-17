@@ -17,6 +17,7 @@ export default class Population{
         this.genePool = [];
 
         this.currentDay = 0;
+        this.madeIt = 0;
 
         for(let i = 0;i<this.size;i++){
             let roc = new Rocket();
@@ -28,27 +29,34 @@ export default class Population{
 
     loop(){
         if(this.currentDay === this.lifeSpan){
+            // console.log(this.madeIt);
+            this.madeIt = 0;
             this.currentDay = 0;
             this.genePool = [];
-            let maxPts = 0;
+            let max = 0;
+            let min = 1000;
             // put rockets in genepool based on their closeness to the target
             for(let rocket of this.population){
-                rocket.gotToTarget = false;
                 let distance = rocket.position.clone().sub(this.target).magnitude;
                 distance = this.scale(distance, 0, this.startingDistance, 10, 0);
-                if(distance === 10){
-                    distance = 100;
-                    let time = this.scale(rocket.tStamp, 0, this.lifeSpan, 500, 0);
+                if(rocket.gotToTarget){
+                    distance = 50;
+                    let time = this.scale(rocket.tStamp, 50, this.lifeSpan, 200, 0);
                     distance += time;
-                }
-                
-                if(distance > maxPts)maxPts = distance;
 
+                }else if(rocket.crashed){
+                    distance/=2;
+                }
+                if(distance > max)max = distance;
+                if(distance < min)min = distance;
                 for(let i = 0;i<distance;i++){
                     this.genePool.push(rocket.dna);
                 }
+
+                rocket.gotToTarget = false;
+                rocket.crashed = false;
             }
-            console.log(maxPts);
+            // console.log(max, min);
             // give a rocket new genes based on the current genepool
             for(let rocket of this.population){
                 rocket.position = this.spawnPoint.clone();
@@ -57,7 +65,7 @@ export default class Population{
                 let par2 = this.genePool[Math.floor(Math.random() * this.genePool.length)];
                 rocket.dna = [];
                 for(let i = 0;i<this.lifeSpan;i++){
-                    if(Math.random() >= 0.0005){
+                    if(Math.random() >= 0.0000){
                         if(i%2===0){
                             rocket.dna.push(par1[i]);
                         }else{
@@ -70,10 +78,18 @@ export default class Population{
             }
         }
         for(let rocket of this.population){
-            if(!rocket.gotToTarget && Math.abs(rocket.position.clone().sub(this.target).magnitude) <= 20){
+            if(!rocket.crashed && 
+                (rocket.position.x <= 0 || 
+                rocket.position.x >= this.ctx.canvas.width || 
+                rocket.position.y <= 0 || 
+                rocket.position.y >= this.ctx.canvas.height)
+            ){
+                rocket.crashed = true;
+            }else if(!rocket.gotToTarget && Math.abs(rocket.position.clone().sub(this.target).magnitude) <= 20){
                 rocket.position = this.target;
                 rocket.gotToTarget = true;
                 rocket.tStamp = this.currentDay;
+                this.madeIt++;
             }else{
                 rocket.applyForce(rocket.dna[this.currentDay]);
                 rocket.update();
