@@ -1,6 +1,7 @@
 import {default as V} from './Vector.js';
 import Population from './Population.js';
-let p = document.querySelector('p');
+let p = document.querySelector('p#gen');
+let pr = document.querySelector('p#prev');
 let canvas = document.querySelector('canvas#myCanvas');
 let ctx = canvas.getContext('2d');
 ctx.canvas.width = 500;

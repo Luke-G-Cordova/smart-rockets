@@ -9,7 +9,6 @@ export default class Population{
         this.size = 25;
         this.spawnPoint = V.createNew(this.ctx.canvas.width/2, this.ctx.canvas.height - 20);
         this.startingDistance = this.spawnPoint.clone().sub(this.target).magnitude;
-        console.log(this.startingDistance); 
         this.irw = 30;
         this.iry = 10;
         this.lifeSpan = 200;
@@ -25,13 +24,13 @@ export default class Population{
             this.giveNewDNA(roc);
             this.population.push(roc);
         }
-        console.log(this.population);
     }
 
     loop(){
         if(this.currentDay === this.lifeSpan){
             this.currentDay = 0;
             this.genePool = [];
+            let maxPts = 0;
             // put rockets in genepool based on their closeness to the target
             for(let rocket of this.population){
                 rocket.gotToTarget = false;
@@ -39,13 +38,17 @@ export default class Population{
                 distance = this.scale(distance, 0, this.startingDistance, 10, 0);
                 if(distance === 10){
                     distance = 100;
-                    let time = this.scale(rocket.timeStamp, 0, this.lifeSpan, 500, 0);
+                    let time = this.scale(rocket.tStamp, 0, this.lifeSpan, 500, 0);
                     distance += time;
                 }
+                
+                if(distance > maxPts)maxPts = distance;
+
                 for(let i = 0;i<distance;i++){
                     this.genePool.push(rocket.dna);
                 }
             }
+            console.log(maxPts);
             // give a rocket new genes based on the current genepool
             for(let rocket of this.population){
                 rocket.position = this.spawnPoint.clone();
@@ -67,14 +70,14 @@ export default class Population{
             }
         }
         for(let rocket of this.population){
-            if(!rocket.gotToTarget && rocket.position.clone().sub(this.target).magnitude <= 40){
+            if(!rocket.gotToTarget && Math.abs(rocket.position.clone().sub(this.target).magnitude) <= 20){
                 rocket.position = this.target;
                 rocket.gotToTarget = true;
                 rocket.tStamp = this.currentDay;
             }else{
                 rocket.applyForce(rocket.dna[this.currentDay]);
                 rocket.update();
-                rocket.tStamp = this.currentDay;
+                if(!rocket.gotToTarget) rocket.tStamp = this.currentDay;
             }
         }
         this.currentDay++;
