@@ -1,28 +1,44 @@
 import {default as V} from './Vector.js';
 import Population from './Population.js';
-
+let p = document.querySelector('p');
 let canvas = document.querySelector('canvas#myCanvas');
 let ctx = canvas.getContext('2d');
 ctx.canvas.width = 500;
 ctx.canvas.height = 500;
 
+let gofast = false;
 
-let target = V.createNew(ctx.canvas.width/2, 30);
 let rockets = new Population(ctx);
 
-loop();
+let target = rockets.target;
+
+let interval = setInterval(loop, 15);
+window.addEventListener('click', () => {
+    gofast = !gofast;
+    clearInterval(interval);
+    interval = setInterval(loop, gofast?0:15);
+});
+let count = 0;
+let gen = 0;
 function loop(){
-
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    if(count===200){
+        count = 0;
+        gen++;
+        p.innerHTML = gen;
+    }
     
-    ctx.fillStyle = 'green';
-    ctx.beginPath();
-    ctx.arc(target.x, target.y, 20, 0, Math.PI*2);
-    ctx.fill();
+    if(true){
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    rockets.draw();
+        rockets.draw();
 
-
+        ctx.fillStyle = 'green';
+        ctx.beginPath();
+        ctx.arc(target.x, target.y, 20, 0, Math.PI*2);
+        ctx.fill();
+    }
+    rockets.loop();
+    count++;
 }
 

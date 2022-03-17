@@ -11,6 +11,10 @@ export default class Vector {
     static createRandom(){
         return new Vector({x: Math.random(), y: Math.random()});
     }
+    static createRandom(rangeMin, rangeMax){
+        let times = rangeMax - rangeMin;
+        return new Vector({x: (Math.random() * times) + rangeMin, y: (Math.random() * times) + rangeMin});
+    }
     add(vector){
         this.x += vector.x;
         this.y += vector.y;
