@@ -36,10 +36,10 @@ export default class Population{
             for(let rocket of this.population){
                 rocket.gotToTarget = false;
                 let distance = rocket.position.clone().sub(this.target).magnitude;
-                distance = this.scale(distance, 0, this.startingDistance, 50, 0);
-                if(distance === 50){
-                    distance = 200;
-                    let time = this.scale(rocket.timeStamp, 0, this.lifeSpan, 300, 0);
+                distance = this.scale(distance, 0, this.startingDistance, 10, 0);
+                if(distance === 10){
+                    distance = 100;
+                    let time = this.scale(rocket.timeStamp, 0, this.lifeSpan, 500, 0);
                     distance += time;
                 }
                 for(let i = 0;i<distance;i++){
